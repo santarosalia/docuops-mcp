@@ -4,7 +4,7 @@ import {
   createDocument,
   createDocumentSync,
   DocuOpsApiError,
-  getClientConfig,
+  type DocuOpsClientConfig,
 } from "../client.js";
 import { filePathSchema, metadataSchema } from "../schemas.js";
 
@@ -31,7 +31,10 @@ function formatError(error: unknown): string {
   return String(error);
 }
 
-export function registerDocumentTools(server: McpServer) {
+export function registerDocumentTools(
+  server: McpServer,
+  getConfig: () => DocuOpsClientConfig,
+) {
   server.registerTool(
     "ExternalDocumentController_createDocument",
     {
@@ -48,7 +51,7 @@ export function registerDocumentTools(server: McpServer) {
     },
     async ({ filePath, projectId, documentId, metadata }) => {
       try {
-        const config = getClientConfig();
+        const config = getConfig();
         const data = await createDocument(config, filePath, {
           projectId,
           documentId,
@@ -77,7 +80,7 @@ export function registerDocumentTools(server: McpServer) {
     },
     async ({ filePath, projectId, documentId, metadata }) => {
       try {
-        const config = getClientConfig();
+        const config = getConfig();
         const data = await createDocumentSync(config, filePath, {
           projectId,
           documentId,

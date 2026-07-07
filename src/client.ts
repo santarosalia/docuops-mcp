@@ -17,8 +17,27 @@ export interface DocuOpsClientConfig {
   apiToken: string;
 }
 
-export function getClientConfig(): DocuOpsClientConfig {
-  const baseUrl = process.env.DOCUOPS_API_BASE_URL?.replace(/\/+$/, "");
+export function normalizeBaseUrl(baseUrl: string): string {
+  const trimmed = baseUrl.trim().replace(/\/+$/, "");
+  if (trimmed.endsWith("/api/v1")) {
+    return trimmed;
+  }
+
+  try {
+    const url = new URL(trimmed);
+    if (!url.pathname || url.pathname === "/") {
+      return `${trimmed}/api/v1`;
+    }
+  } catch {
+    return trimmed;
+  }
+
+  return trimmed;
+}
+
+export function getClientConfigFromEnv(): DocuOpsClientConfig {
+  const rawBaseUrl = process.env.DOCUOPS_API_BASE_URL;
+  const baseUrl = rawBaseUrl ? normalizeBaseUrl(rawBaseUrl) : undefined;
   const apiToken = process.env.DOCUOPS_API_TOKEN;
 
   if (!baseUrl) {
@@ -37,9 +56,27 @@ function authHeaders(apiToken: string): Record<string, string> {
   return { Authorization: `Bearer ${apiToken}` };
 }
 
+function isHtmlResponse(contentType: string, text: string): boolean {
+  const trimmed = text.trimStart();
+  return (
+    contentType.includes("text/html") ||
+    trimmed.startsWith("<!DOCTYPE") ||
+    trimmed.startsWith("<html")
+  );
+}
+
 async function parseResponse(res: Response): Promise<unknown> {
+  const contentType = res.headers.get("content-type") ?? "";
   const text = await res.text();
   if (!text) return null;
+
+  if (isHtmlResponse(contentType, text)) {
+    throw new DocuOpsApiError(
+      "DocuOps API가 HTML 페이지를 반환했습니다. base URL이 API 경로를 포함하는지 확인하세요. (예: https://docuops.ngrok.dev/api/v1)",
+      res.status,
+      { hint: "웹 프론트엔드 URL이 아닌 External API base URL을 사용해야 합니다." },
+    );
+  }
 
   try {
     return JSON.parse(text) as unknown;

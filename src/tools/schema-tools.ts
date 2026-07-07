@@ -6,7 +6,7 @@ import {
   deleteSchema,
   DocuOpsApiError,
   getAllSchemas,
-  getClientConfig,
+  type DocuOpsClientConfig,
   getSchemaValue,
   updateSchema,
 } from "../client.js";
@@ -39,7 +39,10 @@ function formatError(error: unknown): string {
   return String(error);
 }
 
-export function registerSchemaTools(server: McpServer) {
+export function registerSchemaTools(
+  server: McpServer,
+  getConfig: () => DocuOpsClientConfig,
+) {
   server.registerTool(
     "ExternalSchemaController_getAllSchemas",
     {
@@ -50,7 +53,7 @@ export function registerSchemaTools(server: McpServer) {
     },
     async () => {
       try {
-        const config = getClientConfig();
+        const config = getConfig();
         const data = await getAllSchemas(config);
         return okJson(data);
       } catch (error) {
@@ -71,7 +74,7 @@ export function registerSchemaTools(server: McpServer) {
     },
     async ({ body }) => {
       try {
-        const config = getClientConfig();
+        const config = getConfig();
         const data = await createSchema(config, body);
         return okJson(data);
       } catch (error) {
@@ -93,7 +96,7 @@ export function registerSchemaTools(server: McpServer) {
     },
     async ({ id, documentId }) => {
       try {
-        const config = getClientConfig();
+        const config = getConfig();
         const data = await getSchemaValue(config, id, documentId);
         return okJson(data);
       } catch (error) {
@@ -115,7 +118,7 @@ export function registerSchemaTools(server: McpServer) {
     },
     async ({ id, body }) => {
       try {
-        const config = getClientConfig();
+        const config = getConfig();
         const data = await updateSchema(config, id, body);
         return okJson(data);
       } catch (error) {
@@ -139,7 +142,7 @@ export function registerSchemaTools(server: McpServer) {
     },
     async ({ id }) => {
       try {
-        const config = getClientConfig();
+        const config = getConfig();
         const data = await deleteSchema(config, id);
         return okJson(data ?? { success: true });
       } catch (error) {
@@ -162,7 +165,7 @@ export function registerSchemaTools(server: McpServer) {
     },
     async ({ id, projectId, filePath }) => {
       try {
-        const config = getClientConfig();
+        const config = getConfig();
         const data = await createSchemaValueFromDocument(
           config,
           id,
