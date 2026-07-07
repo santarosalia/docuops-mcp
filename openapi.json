@@ -1,0 +1,116 @@
+{
+  "openapi": "3.0.0",
+  "paths": {
+    "/schemas": {
+      "get": {
+        "operationId": "ExternalSchemaController_getAllSchemas",
+        "summary": "유저가 속한 워크스페이스의 스키마 모두 조회",
+        "tags": ["ExternalSchema"],
+        "security": [{ "api-token": [] }],
+        "responses": {
+          "201": {
+            "description": "스키마를 성공적으로 조회했습니다."
+          }
+        }
+      },
+      "post": {
+        "operationId": "ExternalSchemaController_createSchema",
+        "summary": "스키마 생성",
+        "tags": ["ExternalSchema"],
+        "security": [{ "api-token": [] }],
+        "responses": {
+          "201": {
+            "description": "스키마를 성공적으로 생성했습니다."
+          }
+        }
+      }
+    },
+    "/schemas/{id}": {
+      "get": {
+        "operationId": "ExternalSchemaController_getSchemaValue",
+        "summary": "스키마 값 조회",
+        "tags": ["ExternalSchema"],
+        "security": [{ "api-token": [] }],
+        "responses": {
+          "201": {
+            "description": "스키마 값 조회 완료"
+          }
+        }
+      },
+      "patch": {
+        "operationId": "ExternalSchemaController_updateSchema",
+        "summary": "스키마 업데이트",
+        "tags": ["ExternalSchema"],
+        "security": [{ "api-token": [] }],
+        "responses": {
+          "200": {
+            "description": "스키마를 성공적으로 업데이트했습니다."
+          }
+        }
+      },
+      "delete": {
+        "operationId": "ExternalSchemaController_deleteSchema",
+        "summary": "스키마 삭제",
+        "tags": ["ExternalSchema"],
+        "security": [{ "api-token": [] }],
+        "responses": {
+          "200": {
+            "description": "스키마를 성공적으로 삭제했습니다."
+          }
+        }
+      }
+    },
+    "/schemas/{id}/extract": {
+      "post": {
+        "operationId": "ExternalSchemaController_createSchemaValueFromDocument",
+        "summary": "문서 추출과 스키마 값 추출 동시 요청",
+        "tags": ["ExternalSchema"],
+        "security": [{ "api-token": [] }],
+        "responses": {
+          "201": {
+            "description": "추출 완료"
+          }
+        }
+      }
+    },
+    "/documents": {
+      "post": {
+        "operationId": "ExternalDocumentController_createDocument",
+        "tags": ["ExternalDocument"],
+        "security": [{ "api-token": [] }],
+        "responses": {
+          "200": {
+            "description": "Document created successfully"
+          }
+        }
+      }
+    },
+    "/documents/sync": {
+      "post": {
+        "operationId": "ExternalDocumentController_createDocumentSync",
+        "tags": ["ExternalDocument"],
+        "security": [{ "api-token": [] }],
+        "responses": {
+          "200": {
+            "description": "문서 처리 완료(성공/실패) 상태를 동기 반환합니다."
+          }
+        }
+      }
+    }
+  },
+  "info": {
+    "title": "DocuOps External API",
+    "description": "외부 연동용 API 문서 (API Token 인증)",
+    "version": "1.0"
+  },
+  "servers": [{ "url": "/api/v1" }],
+  "components": {
+    "securitySchemes": {
+      "api-token": {
+        "scheme": "bearer",
+        "bearerFormat": "JWT",
+        "type": "http"
+      }
+    }
+  }
+}
